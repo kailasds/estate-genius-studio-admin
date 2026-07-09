@@ -203,7 +203,7 @@ function PlanPage() {
   return (
     <AppShell
       title="My Will"
-      subtitle="Answer a few questions and we'll shape your documents live."
+      subtitle="We'll guide you through a few simple questions and generate personalized legal documents based on your answers."
       action={
         <div className="flex items-center gap-2">
           <SavedChip updatedAt={draft.updatedAt} />
@@ -330,9 +330,9 @@ function StartStep({ personaName, onAboutYou, onKnowWhat }: {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="text-center">
-        <h2 className="font-serif text-3xl">How would you like to begin, {personaName}?</h2>
+        <h2 className="font-serif text-3xl">How would you like to get started, {personaName}?</h2>
         <p className="text-sm text-muted-foreground mt-2">
-          Two paths to the same place. Pick whichever feels right — you can switch later.
+          Choose the experience that works best for you. You can switch between them at any time.
         </p>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
@@ -344,12 +344,12 @@ function StartStep({ personaName, onAboutYou, onKnowWhat }: {
           <div className="h-11 w-11 rounded-lg bg-primary/10 text-primary grid place-items-center mb-4">
             <Compass className="h-5 w-5" />
           </div>
-          <div className="font-serif text-xl leading-tight">Tell us about you</div>
+          <div className="font-serif text-xl leading-tight">Guided Recommendation</div>
           <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-            Answer a short set of guiding questions and we'll recommend the exact documents that fit your situation.
+            Answer a few simple questions about your family, finances, and goals. We'll recommend the legal documents that best fit your situation before you begin.
           </p>
           <div className="text-xs text-primary mt-4 inline-flex items-center gap-1 group-hover:gap-2 transition-all">
-            Guided setup <ArrowRight className="h-3.5 w-3.5" />
+            Start Guided Setup <ArrowRight className="h-3.5 w-3.5" />
           </div>
         </button>
         <button
@@ -360,12 +360,12 @@ function StartStep({ personaName, onAboutYou, onKnowWhat }: {
           <div className="h-11 w-11 rounded-lg bg-primary/10 text-primary grid place-items-center mb-4">
             <ClipboardList className="h-5 w-5" />
           </div>
-          <div className="font-serif text-xl leading-tight">I know what I need</div>
+          <div className="font-serif text-xl leading-tight">Choose Documents Yourself</div>
           <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-            Skip discovery and jump straight to picking your services. Head into the profiling from there.
+            Already know which legal documents you need? Skip the recommendation step and select your documents directly.
           </p>
           <div className="text-xs text-primary mt-4 inline-flex items-center gap-1 group-hover:gap-2 transition-all">
-            Choose services <ArrowRight className="h-3.5 w-3.5" />
+            Choose Documents <ArrowRight className="h-3.5 w-3.5" />
           </div>
         </button>
       </div>

@@ -6,7 +6,7 @@ import { UserCog } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 
 const ROLE_HOME: Record<Role, string> = {
-  admin: "/templates",
+  admin: "/dashboard",
   member: "/member",
   spouse: "/member",
 };
@@ -21,7 +21,7 @@ export function RoleSwitcher() {
   };
   return (
     <div className="flex items-center gap-1.5 rounded-full border border-border bg-card pl-2.5 pr-1 h-8">
-      <UserCog className="h-3.5 w-3.5 text-muted-foreground" />
+      <UserCog className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
       <Select value={role} onValueChange={onChange}>
         <SelectTrigger className="h-7 border-0 shadow-none bg-transparent text-[12px] font-medium focus:ring-0 focus:border-transparent gap-1 px-1 hover:bg-transparent">
           <SelectValue />

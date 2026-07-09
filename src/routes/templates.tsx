@@ -470,10 +470,10 @@ function AttributesTab({ template }: { template: Template }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-6">
         <div className="text-sm text-muted-foreground">AI parses the template body for merge fields, bracketed placeholders and blanks. Nothing is saved until you approve.</div>
         <Button size="sm" onClick={() => detect.mutate()} disabled={detect.isPending}>
-          {detect.isPending ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5 mr-1.5 text-gold" />}
+          {detect.isPending ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin text-white" /> : <Sparkles className="h-3.5 w-3.5 mr-1.5 text-white" />}
           Extract data attributes
         </Button>
       </div>
@@ -827,9 +827,17 @@ function Empty({ label }: { label: string }) {
 // Re-exports for other routes that share these primitives / scope filter.
 export { Field, Empty as EmptyState };
 
-export function ScopeFilter({ scope, setScope }: { scope: ServiceTag | "all"; setScope: (s: ServiceTag | "all") => void }) {
+export function ScopeFilter({
+  scope,
+  setScope,
+  className = "mb-6",
+}: {
+  scope: ServiceTag | "all";
+  setScope: (s: ServiceTag | "all") => void;
+  className?: string;
+}) {
   return (
-    <div className="mb-6 flex items-center gap-2 text-sm flex-wrap">
+    <div className={`${className} flex items-center gap-2 text-sm flex-wrap`}>
       <span className="text-muted-foreground mr-2">Scope</span>
       <button
         onClick={() => setScope("all")}
@@ -1001,7 +1009,7 @@ function IngestChatDialog({ open, onOpenChange, onCreated }: {
 
           {/* Right: chat */}
           <div className="space-y-2 flex flex-col">
-            <div className="rounded-lg border border-border bg-card min-h-[24rem] max-h-[28rem] overflow-y-auto p-4 space-y-3 flex-1">
+            <div className="rounded-lg border border-border bg-card min-h-96 max-h-112 overflow-y-auto p-4 space-y-3 flex-1">
               {messages.map((m, i) => (
                 <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                   <div className={`rounded-lg px-3 py-2 max-w-[85%] text-sm whitespace-pre-wrap ${m.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"}`}>

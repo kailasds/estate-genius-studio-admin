@@ -64,35 +64,38 @@ function MemberHome() {
     : null;
 
   const cards: {
-    to: string; title: string; icon: typeof ScrollText;
+    to: string; title: string; icon: typeof ScrollText; image: string;
     body: string; cta: string; meta: string; tone: Tone;
   }[] = [
     {
       to: "/member/plan",
-      title: started ? "Continue my Will" : "Start my Will",
+      title: started ? "Continue Your Will" : "Create Your Will",
       icon: ScrollText,
+      image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=800&q=60",
       body: started
         ? `You're ${pct}% of the way through. Pick up where you left off.`
-        : "We'll ask a few questions and draft the Will that fits your situation.",
-      cta: started ? "Resume" : "Begin",
+        : "We'll ask a few questions and generate a personalized Will tailored to your situation.",
+      cta: started ? "Continue" : "Start",
       meta: started && minutesLeft ? `About ${minutesLeft} min left` : "About 10 min",
       tone: "violet",
     },
     {
       to: "/member/find-attorney",
-      title: "Find an attorney",
+      title: "Find an Estate Planning Attorney",
       icon: MapPin,
-      body: "Prefer to sit down in person? Locate a network attorney near you.",
-      cta: "Search",
+      image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=800&q=60",
+      body: "Connect with experienced attorneys near you for legal advice, document review, or in-person assistance.",
+      cta: "Find Attorneys",
       meta: "In-person option",
       tone: "warning",
     },
     {
       to: "/member/learn",
-      title: "Learn",
+      title: "Learning Center",
       icon: BookOpen,
-      body: "FAQs, short videos, and guides curated for your plan.",
-      cta: "Browse",
+      image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=800&q=60",
+      body: "Explore articles, videos, and answers to common questions to better understand estate planning and your legal documents.",
+      cta: "Explore Resources",
       meta: "Reading & videos",
       tone: "info",
     },
@@ -100,8 +103,8 @@ function MemberHome() {
 
   return (
     <AppShell
-      title={`Welcome, ${persona.name.split(" ")[0]}`}
-      subtitle="Estate planning made calm and clear. Choose where you'd like to start."
+      title={`Welcome back, ${persona.name.split(" ")[0]}`}
+      subtitle="Everything you need to create, manage, and protect your estate plan — start where it makes the most sense for you."
     >
       {/* Hero progress panel */}
       {started && counts ? (
@@ -141,7 +144,7 @@ function MemberHome() {
               </Button>
               <Button asChild size="sm">
                 <Link to="/member/plan">
-                  Resume <ArrowRight className="h-3.5 w-3.5" />
+                  Continue <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </Button>
             </div>
@@ -158,19 +161,30 @@ function MemberHome() {
             <Link
               key={c.to}
               to={c.to}
-              className={`group relative flex flex-col rounded-xl border border-border bg-card p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_28px_-14px_rgba(15,17,21,0.15)] ring-1 ring-transparent ${t.ring}`}
+              className={`group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_28px_-14px_rgba(15,17,21,0.15)] ring-1 ring-transparent ${t.ring}`}
             >
-              <div className="flex items-start justify-between mb-5">
-                <div className={`h-11 w-11 rounded-xl grid place-items-center ${t.tile}`}>
+              <div className="relative aspect-video w-full overflow-hidden">
+                <img
+                  src={c.image}
+                  alt=""
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/0" />
+                <div className={`absolute left-4 top-4 h-11 w-11 rounded-xl grid place-items-center ${t.tile}`}>
                   <Icon className="h-[18px] w-[18px]" strokeWidth={2} />
                 </div>
-                <span className="text-[11px] text-muted-foreground/80 uppercase tracking-wider">{c.meta}</span>
+                <span className="absolute right-4 bottom-3 text-[11px] text-white/90 uppercase tracking-wider drop-shadow">
+                  {c.meta}
+                </span>
               </div>
-              <h2 className="font-serif text-[20px] leading-tight text-foreground">{c.title}</h2>
-              <p className="text-sm text-muted-foreground mt-2 leading-relaxed flex-1">{c.body}</p>
-              <div className={`mt-5 inline-flex items-center gap-1.5 text-sm font-medium ${t.accent}`}>
-                {c.cta}
-                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+              <div className="flex flex-col flex-1 p-6">
+                <h2 className="font-serif text-[20px] leading-tight text-foreground">{c.title}</h2>
+                <p className="text-sm text-muted-foreground mt-2 leading-relaxed flex-1">{c.body}</p>
+                <div className={`mt-5 inline-flex items-center gap-1.5 text-sm font-medium ${t.accent}`}>
+                  {c.cta}
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                </div>
               </div>
             </Link>
           );

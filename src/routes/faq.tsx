@@ -50,9 +50,18 @@ function FaqPage() {
     >
       <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
         <TabsList className="mb-6">
-          <TabsTrigger value="faq">FAQs</TabsTrigger>
-          <TabsTrigger value="content">Documents & Videos</TabsTrigger>
-          <TabsTrigger value="preview"><Eye className="h-3.5 w-3.5 mr-1.5" />Member preview</TabsTrigger>
+          <TabsTrigger value="faq" className="gap-1.5">
+            <HelpCircle className="h-3.5 w-3.5 shrink-0" />
+            <span>FAQs</span>
+          </TabsTrigger>
+          <TabsTrigger value="content" className="gap-1.5">
+            <FileText className="h-3.5 w-3.5 shrink-0" />
+            <span>Documents &amp; Videos</span>
+          </TabsTrigger>
+          <TabsTrigger value="preview" className="gap-1.5">
+            <Eye className="h-3.5 w-3.5 shrink-0" />
+            <span>Member preview</span>
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="faq"><LibraryTab kind="faq" /></TabsContent>
         <TabsContent value="content"><LibraryTab kind="content" /></TabsContent>
@@ -135,9 +144,9 @@ function LibraryTab({ kind }: { kind: "faq" | "content" }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3 justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3 flex-wrap">
-          <ScopeFilter scope={scope} setScope={setScope} />
+          <ScopeFilter scope={scope} setScope={setScope} className="mb-0" />
           {allTopics.length > 0 && (
             <Select value={topicFilter} onValueChange={setTopicFilter}>
               <SelectTrigger className="w-48"><SelectValue placeholder="All topics" /></SelectTrigger>
@@ -147,15 +156,15 @@ function LibraryTab({ kind }: { kind: "faq" | "content" }) {
               </SelectContent>
             </Select>
           )}
+        </div>
+        <div className="flex items-center gap-3 flex-wrap">
           <label className="flex items-center gap-2 text-sm text-muted-foreground">
             <Switch checked={showDrafts} onCheckedChange={setShowDrafts} />
             Show drafts
           </label>
-        </div>
-        <div className="flex gap-2">
           {kind === "faq" ? (
-            <Button onClick={() => create.mutate("faq")}>
-              <Plus className="h-4 w-4 mr-1.5" />New FAQ
+            <Button onClick={() => create.mutate("faq")} className="gap-1.5 px-3.5">
+              <Plus className="h-4 w-4" />New FAQ
             </Button>
           ) : (
             <>
@@ -218,7 +227,7 @@ function FaqRow({ row, onOpen, onUp, onDown }: {
         <div className="text-sm text-muted-foreground mt-1 line-clamp-2">{row.body}</div>
       </button>
       <TagChips tags={row.tags} />
-    </Card>
+    </Card>     
   );
 }
 

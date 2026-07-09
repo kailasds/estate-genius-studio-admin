@@ -168,7 +168,7 @@ function RuleRow({ rule, onOpen }: { rule: Rule; onOpen: () => void }) {
         <div className="flex items-center gap-2">
           <div className="font-medium truncate">{rule.name}</div>
           {isBaseline && <Badge variant="secondary" className="text-[10px]">Baseline</Badge>}
-          {isBundle && <Badge className="text-[10px] bg-gold/20 text-gold-foreground hover:bg-gold/20">Bundle</Badge>}
+          {isBundle && <Badge className="text-[10px] border border-gold/30 bg-gold/15 text-foreground hover:bg-gold/15">Bundle</Badge>}
           <Badge variant="outline" className="text-[10px] capitalize">{rule.flag}</Badge>
         </div>
         <div className="text-xs text-muted-foreground mt-0.5 truncate">

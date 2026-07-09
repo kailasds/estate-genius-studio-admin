@@ -8,6 +8,6 @@ export const Route = createFileRoute("/")({
         throw redirect({ to: "/member" });
       }
     }
-    throw redirect({ to: "/templates" });
+    throw redirect({ to: "/dashboard" });
   },
 });

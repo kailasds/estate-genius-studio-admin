@@ -232,8 +232,8 @@ function FindAttorneyPage() {
         )}
         {results.map((a) => (
           <Card key={a.id} className="p-5 hover:shadow-md transition-shadow">
-            <div className="flex items-start justify-between gap-4 flex-wrap">
-              <div className="flex-1 min-w-[240px]">
+            <div className="flex items-center justify-between gap-6 flex-wrap">
+              <div className="flex-1 min-w-60">
                 <div className="flex items-center gap-2 flex-wrap">
                   <div className="font-serif text-lg">{a.name}</div>
                   <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
@@ -249,20 +249,20 @@ function FindAttorneyPage() {
                   ))}
                 </div>
               </div>
-              <div className="text-right shrink-0 space-y-2">
+              <div className="ml-auto flex shrink-0 flex-col items-end gap-3 text-right">
                 {a.distance != null && (
-                  <div className="text-xs text-muted-foreground inline-flex items-center gap-1">
+                  <div className="text-xs text-muted-foreground inline-flex items-center justify-end gap-2">
                     <MapPin className="h-3 w-3" /> {a.distance.toFixed(1)} mi away
                   </div>
                 )}
-                <div className="text-xs inline-flex items-center gap-1 text-primary">
+                <div className="text-xs inline-flex items-center justify-end gap-2 text-primary">
                   <CalendarCheck className="h-3 w-3" /> Next: {a.nextAvail}
                 </div>
-                <a href={`tel:${a.phone.replace(/[^0-9]/g, "")}`} className="block text-sm inline-flex items-center gap-1">
+                <a href={`tel:${a.phone.replace(/[^0-9]/g, "")}`} className="inline-flex text-sm items-center justify-end gap-2">
                   <Phone className="h-3.5 w-3.5" /> {a.phone}
                 </a>
                 <Button size="sm" onClick={() => setSelected(a)}>
-                  <CalendarCheck className="h-4 w-4 mr-1" /> Book consult
+                  <CalendarCheck className="h-4 w-4 mr-2" /> Book consult
                 </Button>
               </div>
             </div>
@@ -297,7 +297,7 @@ function MapView({ origin, attorneys, onPick }: {
   return (
     <Card className="p-0 mb-6 overflow-hidden">
       <div className="relative bg-primary-soft/30">
-        <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-[320px]">
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-80">
           <defs>
             <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
               <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeOpacity="0.08" />

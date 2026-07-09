@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="DEP logo">
+  <defs>
+    <linearGradient id="dep-bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2e93e6" />
+      <stop offset="1" stop-color="#1f7cc7" />
+    </linearGradient>
+    <linearGradient id="dep-shield" x1="18" y1="13" x2="46" y2="53" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" />
+      <stop offset="1" stop-color="#eaf4fd" />
+    </linearGradient>
+  </defs>
+
+  <rect width="64" height="64" rx="16" fill="url(#dep-bg)" />
+
+  <path
+    d="M32 12.5 L46.5 17.5 V31.5 C46.5 41.7 40.8 48.9 32 53.5 C23.2 48.9 17.5 41.7 17.5 31.5 V17.5 Z"
+    fill="url(#dep-shield)"
+    fill-opacity="0.97"
+  />
+
+  <path
+    d="M24.5 32 L29.8 37.5 L40 25.5"
+    fill="none"
+    stroke="#1f7cc7"
+    stroke-width="4.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

@@ -5,7 +5,7 @@ export const Route = createFileRoute("/member")({
     if (typeof window !== "undefined") {
       const role = window.localStorage.getItem("dep:active-role");
       if (role !== "member" && role !== "spouse") {
-        throw redirect({ to: "/templates" });
+        throw redirect({ to: "/dashboard" });
       }
     }
   },

@@ -23,6 +23,12 @@ type NavItem = {
 
 const ADMIN_NAV: { section: string; items: NavItem[] }[] = [
   {
+    section: "Overview",
+    items: [
+      { to: "/dashboard", label: "Home", icon: Home, tone: "primary" },
+    ],
+  },
+  {
     section: "Build",
     items: [
       { to: "/templates", label: "Template Management", icon: LayoutTemplate, tone: "primary" },
@@ -32,7 +38,7 @@ const ADMIN_NAV: { section: string; items: NavItem[] }[] = [
   {
     section: "Configure",
     items: [
-      { to: "/rules", label: "Recommendation Rules", icon: FileText, tone: "violet" },
+      { to: "/rules", label: "Rules Management", icon: FileText, tone: "violet" },
       { to: "/faq", label: "FAQ & Content", icon: HelpCircle, tone: "warning" },
     ],
   },
@@ -66,7 +72,7 @@ const TONE_TILE: Record<NonNullable<NavItem["tone"]>, string> = {
 function crumbFor(pathname: string): string {
   const parts = pathname.split("/").filter(Boolean);
   const last = parts[parts.length - 1] ?? "";
-  if (!last || last === "member" || last === "index") return "Home";
+  if (!last || last === "member" || last === "index" || last === "dashboard") return "Home";
   return last.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
@@ -86,15 +92,31 @@ export function AppShell({ children, title, subtitle, action }: {
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="min-h-screen w-full flex bg-paper">
+      <div
+        className="min-h-screen w-full flex bg-paper"
+        style={{
+          backgroundImage:
+            "linear-gradient(135deg, #ffffff 0%, color-mix(in oklab, var(--sky) 28%, #ffffff) 55%, var(--sky) 100%)",
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "100% 100%",
+        }}
+      >
         <aside
-          className={`${collapsed ? "w-[68px]" : "w-72"} shrink-0 border-r border-border bg-sidebar text-sidebar-foreground flex flex-col transition-[width] duration-200`}
+          className={`${collapsed ? "w-17" : "w-72"} shrink-0 border-r border-border bg-sidebar text-sidebar-foreground flex flex-col transition-[width] duration-200`}
         >
           <div className={`${collapsed ? "px-3" : "px-5"} pt-6 pb-5 border-b border-sidebar-border`}>
             <div className={`flex items-center ${collapsed ? "justify-center" : "gap-3"}`}>
-              <div className="relative h-10 w-10 rounded-xl bg-gradient-to-br from-[var(--cyan)] to-[var(--cyan-edge)] text-white grid place-items-center font-serif text-[15px] shrink-0 shadow-[0_4px_10px_-2px_color-mix(in_oklab,var(--cyan)_45%,transparent)]">
-                {isMember ? persona.initials : "D"}
-              </div>
+              {isMember ? (
+                <div className="relative h-10 w-10 rounded-xl bg-linear-to-br from-(--cyan) to-(--cyan-edge) text-white grid place-items-center font-serif text-[15px] shrink-0 shadow-[0_4px_10px_-2px_color-mix(in_oklab,var(--cyan)_45%,transparent)]">
+                  {persona.initials}
+                </div>
+              ) : (
+                <img
+                  src="/logo.svg"
+                  alt="DEP"
+                  className="relative h-10 w-10 rounded-xl shrink-0 shadow-[0_4px_10px_-2px_color-mix(in_oklab,var(--cyan)_45%,transparent)]"
+                />
+              )}
               {!collapsed && (
                 <div className="min-w-0">
                   <div className="font-serif text-[15px] leading-tight truncate">
@@ -128,12 +150,12 @@ export function AppShell({ children, title, subtitle, action }: {
                         to={item.to}
                         className={`group relative flex items-center gap-3 rounded-lg ${collapsed ? "justify-center px-1.5" : "px-2"} py-2 text-[13px] transition-colors ${
                           active
-                            ? "text-foreground bg-paper-deep/70"
+                            ? "text-foreground"
                             : "hover:bg-paper-deep/50 text-sidebar-foreground/85"
                         }`}
                       >
                         {active && !collapsed && (
-                          <span className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full bg-primary" />
+                          <span className="absolute left-0 top-1.5 bottom-1.5 w-0.75 rounded-r-full bg-primary" />
                         )}
                         <span
                           className={`h-8 w-8 rounded-md grid place-items-center shrink-0 transition-colors ${
@@ -142,7 +164,7 @@ export function AppShell({ children, title, subtitle, action }: {
                               : "bg-transparent text-muted-foreground group-hover:bg-muted"
                           }`}
                         >
-                          <Icon className="h-[15px] w-[15px]" strokeWidth={active ? 2.2 : 1.8} />
+                          <Icon className="h-3.75 w-3.75" strokeWidth={active ? 2.2 : 1.8} />
                         </span>
                         {!collapsed && (
                           <span className={`font-medium leading-tight truncate ${active ? "text-foreground" : ""}`}>
@@ -194,14 +216,16 @@ export function AppShell({ children, title, subtitle, action }: {
 
           <main className="flex-1 overflow-auto">
             <div className="max-w-6xl mx-auto px-8 py-10">
-              <div className="flex items-start justify-between gap-6 mb-8">
-                <div className="min-w-0">
-                  <h1 className="font-serif text-[38px] leading-[1.05] tracking-tight text-foreground">{title}</h1>
-                  {subtitle && (
-                    <p className="text-muted-foreground mt-3 max-w-2xl text-[15px] leading-relaxed">{subtitle}</p>
-                  )}
-                </div>
+              <div className="mb-8">
+                <div className="flex items-start justify-between gap-6">
+                  <div className="min-w-0">
+                    <h1 className="font-serif text-[38px] leading-[1.05] tracking-tight text-foreground">{title}</h1>
+                  </div>
                 {action && <div className="shrink-0">{action}</div>}
+              </div>
+                {subtitle && (
+                  <p className="mt-3 w-full max-w-none text-[15px] leading-relaxed text-muted-foreground">{subtitle}</p>
+                )}
               </div>
               {children}
             </div>

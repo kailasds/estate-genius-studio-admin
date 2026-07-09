@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -20,6 +21,7 @@ import { SERVICE_TAGS, tagLabel, type ServiceTag } from "@/lib/service-tags";
 import {
   Plus, Trash2, GripVertical, Sparkles, Loader2, Upload, Link as LinkIcon, FileText,
   Route as RouteIcon, GitBranch, History, AlertTriangle, CheckCircle2, X, ChevronRight,
+  Compass, ChevronUp, ChevronDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useDebouncedSave } from "@/lib/use-debounced-save";
@@ -32,6 +34,17 @@ type Question = Database["public"]["Tables"]["questions"]["Row"];
 type Attribute = Database["public"]["Tables"]["attributes"]["Row"];
 type KbAsset = Database["public"]["Tables"]["question_kb_assets"]["Row"];
 type Version = Database["public"]["Tables"]["question_set_versions"]["Row"];
+type Signal = Database["public"]["Tables"]["discovery_signals"]["Row"];
+type SignalOption = { value: string; label: string };
+
+const SIGNAL_INPUT_TYPES = [
+  { value: "select", label: "Single choice" },
+  { value: "multiselect", label: "Multiple choice" },
+  { value: "boolean", label: "Yes / No" },
+  { value: "text", label: "Free text" },
+  { value: "number", label: "Number" },
+];
+const SIGNAL_INPUT_TYPE_LABEL: Record<string, string> = Object.fromEntries(SIGNAL_INPUT_TYPES.map((t) => [t.value, t.label]));
 
 const asJson = (v: unknown): Json => v as unknown as Json;
 
@@ -119,46 +132,59 @@ function QuestionsPage() {
         </div>
       }
     >
-      <ScopeFilter scope={scope} setScope={setScope} />
+      <Tabs defaultValue="questions" className="w-full">
+        <TabsList className="mb-6">
+          <TabsTrigger value="questions">Questions</TabsTrigger>
+          <TabsTrigger value="signals">Discovery signals</TabsTrigger>
+        </TabsList>
 
-      {unmapped.length > 0 && (
-        <UnmappedAttributesPanel
-          attributes={unmapped}
-          scope={scope}
-          onCreated={(id) => { qc.invalidateQueries({ queryKey: ["questions"] }); setSelectedId(id); }}
-        />
-      )}
+        <TabsContent value="questions">
+          <ScopeFilter scope={scope} setScope={setScope} />
 
-      {filtered.length === 0 ? (
-        <EmptyState label="No questions in this scope yet. Approve template attributes or add one manually." />
-      ) : (
-        <Card className="divide-y divide-border overflow-hidden shadow-card">
-          {filtered.map((q, i) => {
-            const attr = attributes.find((a) => a.id === q.attribute_id);
-            return (
-              <div
-                key={q.id}
-                onClick={() => setSelectedId(q.id)}
-                className="flex items-start gap-4 px-5 py-4 cursor-pointer hover:bg-muted/40"
-              >
-                <div className="flex flex-col items-center gap-1">
-                  <span className="text-[10px] text-muted-foreground font-mono">{i + 1}</span>
-                  <GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-foreground">{q.prompt}</div>
-                  <div className="text-xs text-muted-foreground mt-1 flex items-center gap-2 flex-wrap">
-                    <Badge variant="outline" className="text-[10px]">{INPUT_TYPE_LABEL[q.input_type] ?? q.input_type}</Badge>
-                    {attr ? <span>→ {attr.label}</span> : <span className="text-amber-700">unmapped</span>}
-                    {hasRouting(q.routing) && <span className="inline-flex items-center gap-1 text-primary"><GitBranch className="h-3 w-3" /> routing</span>}
+          {unmapped.length > 0 && (
+            <UnmappedAttributesPanel
+              attributes={unmapped}
+              scope={scope}
+              onCreated={(id) => { qc.invalidateQueries({ queryKey: ["questions"] }); setSelectedId(id); }}
+            />
+          )}
+
+          {filtered.length === 0 ? (
+            <EmptyState label="No questions in this scope yet. Approve template attributes or add one manually." />
+          ) : (
+            <Card className="divide-y divide-border overflow-hidden shadow-card">
+              {filtered.map((q, i) => {
+                const attr = attributes.find((a) => a.id === q.attribute_id);
+                return (
+                  <div
+                    key={q.id}
+                    onClick={() => setSelectedId(q.id)}
+                    className="flex items-start gap-4 px-5 py-4 cursor-pointer hover:bg-muted/40"
+                  >
+                    <div className="flex flex-col items-center gap-1">
+                      <span className="text-[10px] text-muted-foreground font-mono">{i + 1}</span>
+                      <GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-foreground">{q.prompt}</div>
+                      <div className="text-xs text-muted-foreground mt-1 flex items-center gap-2 flex-wrap">
+                        <Badge variant="outline" className="text-[10px]">{INPUT_TYPE_LABEL[q.input_type] ?? q.input_type}</Badge>
+                        {attr ? <span>→ {attr.label}</span> : <span className="text-amber-700">unmapped</span>}
+                        {hasRouting(q.routing) && <span className="inline-flex items-center gap-1 text-primary"><GitBranch className="h-3 w-3" /> routing</span>}
+                      </div>
+                    </div>
+                    <TagChips tags={q.tags} className="justify-end max-w-xs" />
                   </div>
-                </div>
-                <TagChips tags={q.tags} className="justify-end max-w-xs" />
-              </div>
-            );
-          })}
-        </Card>
-      )}
+                );
+              })}
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="signals">
+          <DiscoverySignalsTab />
+        </TabsContent>
+      </Tabs>
 
       <Sheet open={!!selected} onOpenChange={(o) => !o && setSelectedId(null)}>
         <SheetContent className="w-full sm:max-w-3xl overflow-y-auto">
@@ -948,4 +974,250 @@ function validateAllRouting(questions: Question[]): { ok: boolean; issues: strin
   });
 
   return { ok: issues.length === 0 && questions.length > 0, issues };
+}
+
+/* ============================================================
+   Discovery signals tab — the short "about you" intake members
+   answer before their plan is generated (discovery_signals table).
+   ============================================================ */
+
+function DiscoverySignalsTab() {
+  const qc = useQueryClient();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  const { data: signals = [] } = useQuery({
+    queryKey: ["discovery-signals"],
+    queryFn: async () =>
+      (await supabase.from("discovery_signals").select("*").order("sort_order")).data as Signal[] ?? [],
+  });
+
+  const create = useMutation({
+    mutationFn: async () => {
+      const maxOrder = signals.reduce((m, s) => Math.max(m, s.sort_order), 0);
+      const { data, error } = await supabase.from("discovery_signals").insert({
+        key: `signal_${Date.now()}`, label: "New signal", input_type: "boolean",
+        options: [], sort_order: maxOrder + 10, category: "situation", active: true,
+      }).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (row) => { qc.invalidateQueries({ queryKey: ["discovery-signals"] }); setSelectedId(row.id); },
+  });
+
+  const toggleActive = useMutation({
+    mutationFn: async ({ id, active }: { id: string; active: boolean }) => {
+      const { error } = await supabase.from("discovery_signals").update({ active }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["discovery-signals"] }),
+  });
+
+  const reorder = useMutation({
+    mutationFn: async ({ aId, aOrder, bId, bOrder }: { aId: string; aOrder: number; bId: string; bOrder: number }) => {
+      const [r1, r2] = await Promise.all([
+        supabase.from("discovery_signals").update({ sort_order: bOrder }).eq("id", aId),
+        supabase.from("discovery_signals").update({ sort_order: aOrder }).eq("id", bId),
+      ]);
+      if (r1.error) throw r1.error;
+      if (r2.error) throw r2.error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["discovery-signals"] }),
+  });
+
+  const move = (index: number, dir: -1 | 1) => {
+    const target = index + dir;
+    if (target < 0 || target >= signals.length) return;
+    const a = signals[index], b = signals[target];
+    reorder.mutate({ aId: a.id, aOrder: a.sort_order, bId: b.id, bOrder: b.sort_order });
+  };
+
+  const del = async (s: Signal) => {
+    if (!confirm(`Delete "${s.label}"? Rules that reference it will break.`)) return;
+    await supabase.from("discovery_signals").delete().eq("id", s.id);
+    qc.invalidateQueries({ queryKey: ["discovery-signals"] });
+    toast.success("Signal deleted");
+  };
+
+  const selected = signals.find((s) => s.id === selectedId) ?? null;
+  const activeCount = signals.filter((s) => s.active).length;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <Compass className="h-4 w-4 text-primary shrink-0" />
+            <h3 className="font-serif text-xl">Discovery signals</h3>
+            <Badge variant="outline" className="text-[10px]">{activeCount} active</Badge>
+          </div>
+          <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">
+            The short intake members answer before their plan is generated. Only <b>active</b> signals appear,
+            in the order shown here. Keep it tight — the goal is a two-minute conversation, not a form.
+          </p>
+        </div>
+        <Button onClick={() => create.mutate()} className="shrink-0"><Plus className="h-4 w-4 mr-1.5" />Add signal</Button>
+      </div>
+
+      {signals.length === 0 ? <EmptyState label="No discovery signals yet." /> : (
+        <Card className="divide-y divide-border overflow-hidden shadow-card">
+          {signals.map((s, i) => (
+            <div key={s.id} className="flex items-center gap-3 px-4 py-3.5 hover:bg-muted/40">
+              <div className="flex flex-col items-center text-muted-foreground/50 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => move(i, -1)}
+                  disabled={i === 0}
+                  aria-label="Move up"
+                  className="hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <ChevronUp className="h-3.5 w-3.5" />
+                </button>
+                <GripVertical className="h-3.5 w-3.5" />
+                <button
+                  type="button"
+                  onClick={() => move(i, 1)}
+                  disabled={i === signals.length - 1}
+                  aria-label="Move down"
+                  className="hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <ChevronDown className="h-3.5 w-3.5" />
+                </button>
+              </div>
+
+              <button type="button" onClick={() => setSelectedId(s.id)} className="flex-1 min-w-0 text-left">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className={`font-medium ${s.active ? "text-foreground" : "line-through text-muted-foreground"}`}>{s.label}</span>
+                  <Badge variant="outline" className="text-[10px]">{SIGNAL_INPUT_TYPE_LABEL[s.input_type] ?? s.input_type}</Badge>
+                </div>
+                <div className={`text-xs mt-0.5 font-mono ${s.active ? "text-muted-foreground" : "text-muted-foreground/60"}`}>{s.key}</div>
+              </button>
+
+              <Switch
+                checked={s.active}
+                onCheckedChange={(v) => toggleActive.mutate({ id: s.id, active: v })}
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => del(s)}
+                className="text-muted-foreground hover:text-destructive shrink-0"
+                aria-label="Delete signal"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+        </Card>
+      )}
+
+      <Sheet open={!!selected} onOpenChange={(o) => !o && setSelectedId(null)}>
+        <SheetContent className="w-full sm:max-w-xl overflow-y-auto">
+          {selected && <SignalEditor key={selected.id} row={selected} onDelete={() => setSelectedId(null)} />}
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+}
+
+function SignalEditor({ row, onDelete }: { row: Signal; onDelete: () => void }) {
+  const qc = useQueryClient();
+  const [draft, setDraft] = useState<Signal>(row);
+  const options = (draft.options as unknown as SignalOption[]) ?? [];
+
+  useDebouncedSave(draft, async (v) => {
+    const { error } = await supabase.from("discovery_signals").update({
+      key: v.key, label: v.label, help_text: v.help_text, input_type: v.input_type,
+      options: v.options, sort_order: v.sort_order, category: v.category, active: v.active,
+    }).eq("id", v.id);
+    if (error) throw error;
+    qc.invalidateQueries({ queryKey: ["discovery-signals"] });
+  });
+
+  const del = async () => {
+    if (!confirm("Delete this signal? Rules that reference it will break.")) return;
+    await supabase.from("discovery_signals").delete().eq("id", row.id);
+    qc.invalidateQueries({ queryKey: ["discovery-signals"] });
+    onDelete(); toast.success("Signal deleted");
+  };
+
+  const isChoice = draft.input_type === "select" || draft.input_type === "multiselect";
+
+  return (
+    <>
+      <SheetHeader className="mb-4">
+        <SheetTitle className="font-serif text-2xl">Edit signal</SheetTitle>
+      </SheetHeader>
+
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Label"><Input value={draft.label} onChange={(e) => setDraft({ ...draft, label: e.target.value })} /></Field>
+          <Field label="Key" hint="Referenced by rules.">
+            <Input value={draft.key} onChange={(e) => setDraft({ ...draft, key: e.target.value })} className="font-mono text-sm" />
+          </Field>
+        </div>
+
+        <Field label="Help text"><Input value={draft.help_text ?? ""} onChange={(e) => setDraft({ ...draft, help_text: e.target.value })} /></Field>
+
+        <div className="grid grid-cols-3 gap-4">
+          <Field label="Input type">
+            <Select value={draft.input_type} onValueChange={(v) => setDraft({ ...draft, input_type: v })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>{SIGNAL_INPUT_TYPES.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}</SelectContent>
+            </Select>
+          </Field>
+          <Field label="Category">
+            <Select value={draft.category} onValueChange={(v) => setDraft({ ...draft, category: v })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="situation">Situation</SelectItem>
+                <SelectItem value="assets">Assets</SelectItem>
+                <SelectItem value="goals">Goals</SelectItem>
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field label="Order"><Input type="number" value={draft.sort_order}
+            onChange={(e) => setDraft({ ...draft, sort_order: Number(e.target.value) })} /></Field>
+        </div>
+
+        {isChoice && (
+          <Field label="Options">
+            <div className="space-y-2 rounded-lg border border-border p-3 bg-muted/30">
+              {options.map((o, i) => (
+                <div key={i} className="flex gap-2">
+                  <Input value={o.value} placeholder="value" className="flex-1 font-mono text-sm"
+                    onChange={(e) => {
+                      const arr = [...options]; arr[i] = { ...o, value: e.target.value };
+                      setDraft({ ...draft, options: arr as never });
+                    }} />
+                  <Input value={o.label} placeholder="label" className="flex-1"
+                    onChange={(e) => {
+                      const arr = [...options]; arr[i] = { ...o, label: e.target.value };
+                      setDraft({ ...draft, options: arr as never });
+                    }} />
+                  <Button variant="ghost" size="icon" onClick={() => {
+                    setDraft({ ...draft, options: options.filter((_, j) => j !== i) as never });
+                  }}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+              <Button variant="outline" size="sm" onClick={() => {
+                setDraft({ ...draft, options: [...options, { value: "", label: "" }] as never });
+              }}>
+                <Plus className="h-3.5 w-3.5 mr-1" />Add option
+              </Button>
+            </div>
+          </Field>
+        )}
+
+        <div className="flex items-center justify-between pt-4 border-t border-border">
+          <label className="flex items-center gap-2 text-sm">
+            <Switch checked={draft.active} onCheckedChange={(v) => setDraft({ ...draft, active: v })} />
+            Active
+          </label>
+          <Button variant="ghost" onClick={del} className="text-destructive"><Trash2 className="h-4 w-4 mr-1.5" />Delete</Button>
+        </div>
+      </div>
+    </>
+  );
 }
