@@ -2,6 +2,7 @@ import type { LocationRewrite } from "@tanstack/react-router";
 
 const INTERNAL_ROUTE_PREFIXES = [
   "/api",
+  "/dashboard",
   "/faq",
   "/member",
   "/questions",
