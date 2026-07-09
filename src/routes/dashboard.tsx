@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
+import { toPublicPath } from "@/lib/public-path";
 import { LayoutTemplate, ListChecks, FileText, HelpCircle, ArrowRight, type LucideIcon } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard")({ component: AdminHome });
@@ -93,7 +94,7 @@ function AdminHome() {
             >
               <div className="relative aspect-video w-full overflow-hidden">
                 <img
-                  src={c.image}
+                  src={toPublicPath(c.image)}
                   alt=""
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
                   loading="lazy"

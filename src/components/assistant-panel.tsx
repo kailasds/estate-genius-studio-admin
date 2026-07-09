@@ -16,6 +16,7 @@ import { Link } from "@tanstack/react-router";
 
 import { toast } from "sonner";
 import { PERSONAS, useRole } from "@/lib/role-context";
+import { toPublicPath } from "@/lib/public-path";
 
 export type AssistantContext = {
   questionPrompt?: string;
@@ -48,7 +49,7 @@ export function AssistantPanel({
   const { messages, sendMessage, status, setMessages } = useChat({
     id: `assistant:${role}${compact ? ":fab" : ""}`,
     transport: new DefaultChatTransport({
-      api: "/api/chat",
+      api: toPublicPath("/api/chat"),
       body: { persona: role, context },
     }),
     onError: (err) => toast.error(err.message || "Something went wrong."),

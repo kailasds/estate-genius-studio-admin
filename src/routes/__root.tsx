@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { RoleProvider } from "@/lib/role-context";
 import { AutosaveProvider } from "@/lib/autosave-context";
 import { Toaster } from "@/components/ui/sonner";
+import { toPublicPath } from "@/lib/public-path";
 
 function NotFoundComponent() {
   return (
@@ -74,13 +75,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "DEP Admin Portal — MetLife Legal Plans" },
       { name: "twitter:description", content: "Back-office admin portal for configuring the MetLife Legal Plans digital estate-planning experience." },
-      { property: "og:image", content: "/images/site-preview.png" },
-      { name: "twitter:image", content: "/images/site-preview.png" },
+      { property: "og:image", content: toPublicPath("/images/site-preview.png") },
+      { name: "twitter:image", content: toPublicPath("/images/site-preview.png") },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/logo.svg", type: "image/svg+xml" },
-      { rel: "icon", href: "/favicon.ico", sizes: "any" },
+      { rel: "icon", href: toPublicPath("/logo.svg"), type: "image/svg+xml" },
+      { rel: "icon", href: toPublicPath("/favicon.ico"), sizes: "any" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" },

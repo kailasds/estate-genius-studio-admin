@@ -10,6 +10,7 @@ import { AutosaveChip } from "@/components/autosave-chip";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { PERSONAS, useRole } from "@/lib/role-context";
+import { toPublicPath } from "@/lib/public-path";
 import { FloatingAssistant } from "@/components/floating-assistant";
 import { VaultSheet } from "@/components/vault-sheet";
 
@@ -112,7 +113,7 @@ export function AppShell({ children, title, subtitle, action }: {
                 </div>
               ) : (
                 <img
-                  src="/logo.svg"
+                  src={toPublicPath("/logo.svg")}
                   alt="DEP"
                   className="relative h-10 w-10 rounded-xl shrink-0 shadow-[0_4px_10px_-2px_color-mix(in_oklab,var(--cyan)_45%,transparent)]"
                 />

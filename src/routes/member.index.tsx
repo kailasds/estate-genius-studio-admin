@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useRole, PERSONAS } from "@/lib/role-context";
 import { useDraft, percentComplete } from "@/lib/member-draft";
+import { toPublicPath } from "@/lib/public-path";
 import {
   ScrollText, MapPin, BookOpen, ArrowRight, Clock, Check, FileText, Sparkles,
 } from "lucide-react";
@@ -165,7 +166,7 @@ function MemberHome() {
             >
               <div className="relative aspect-video w-full overflow-hidden">
                 <img
-                  src={c.image}
+                  src={toPublicPath(c.image)}
                   alt=""
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
                   loading="lazy"

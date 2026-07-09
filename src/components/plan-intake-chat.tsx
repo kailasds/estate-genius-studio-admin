@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useRole, PERSONAS } from "@/lib/role-context";
 import { loadDraft } from "@/lib/member-draft";
+import { toPublicPath } from "@/lib/public-path";
 import { SERVICE_TAGS, EXTRA_DOCS, tagLabel } from "@/lib/service-tags";
 
 type PlanReady = {
@@ -83,7 +84,7 @@ export function PlanIntakeChat({ onBack }: { onBack: () => void }) {
   const { messages, sendMessage, status, setMessages } = useChat({
     id: `plan-intake:${role}`,
     transport: new DefaultChatTransport({
-      api: "/api/chat",
+      api: toPublicPath("/api/chat"),
       body: () => ({ persona: role, planIntake }),
     }),
     onError: (err) => toast.error(err.message || "Something went wrong."),
