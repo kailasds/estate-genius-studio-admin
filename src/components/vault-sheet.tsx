@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useRole, PERSONAS, type Role } from "@/lib/role-context";
 import { loadDraft } from "@/lib/member-draft";
 import { usePlanShare } from "@/lib/plan-share";
+import { toPublicUrl } from "@/lib/public-path";
 import { tagLabel } from "@/lib/service-tags";
 import { toast } from "sonner";
 
@@ -87,7 +88,7 @@ function VaultContents({ role, onClose }: { role: Role; onClose: () => void }) {
 
   const handleShare = (doc: string) => {
     const token = createLink(doc, role);
-    const url = `${window.location.origin}/share/${token}`;
+    const url = toPublicUrl(`/share/${token}`);
     navigator.clipboard?.writeText(url).catch(() => {});
     toast.success("Secure share link copied");
   };

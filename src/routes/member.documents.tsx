@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useRole, PERSONAS, type Role } from "@/lib/role-context";
 import { loadDraft } from "@/lib/member-draft";
 import { usePlanShare, getShare, type Permission } from "@/lib/plan-share";
+import { toPublicUrl } from "@/lib/public-path";
 import { tagLabel } from "@/lib/service-tags";
 import {
   FileText, Share2, Link as LinkIcon, Eye, Pencil, Copy, XCircle, ArrowRight, ShieldCheck, Users,
@@ -99,7 +100,7 @@ function DocumentsPage() {
                     links={state.links.filter((l) => l.doc === doc && l.owner === role)}
                     onCreateLink={() => {
                       const t = createLink(doc, role);
-                      const url = `${window.location.origin}/share/${t}`;
+                      const url = toPublicUrl(`/share/${t}`);
                       navigator.clipboard?.writeText(url).catch(() => {});
                       toast.success("Secure link copied to clipboard");
                     }}
@@ -255,7 +256,7 @@ function LinksDialog({
             <p className="text-sm text-muted-foreground">No links yet.</p>
           )}
           {links.map((l) => {
-            const url = typeof window !== "undefined" ? `${window.location.origin}/share/${l.token}` : `/share/${l.token}`;
+            const url = toPublicUrl(`/share/${l.token}`);
             const revoked = !!l.revokedAt;
             return (
               <div key={l.token} className="flex items-center gap-2 border border-border rounded-md p-2">
