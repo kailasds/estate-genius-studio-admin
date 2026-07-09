@@ -950,15 +950,15 @@ function IngestChatDialog({ open, onOpenChange, onCreated }: {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl">
+      <DialogContent className="max-w-5xl max-h-[calc(100vh-2rem)] overflow-hidden grid-rows-[auto_minmax(0,1fr)_auto]">
         <DialogHeader>
           <DialogTitle className="font-serif text-2xl flex items-center gap-2"><MessageSquare className="h-5 w-5 text-primary" />Chat assist — ingest a template</DialogTitle>
           <DialogDescription>Paste text or upload a plain-text template. Chat with the assistant, extract fields, then ingest as a new draft. Nothing is saved until you press Ingest.</DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-0 overflow-y-auto pr-1">
           {/* Left: source + metadata */}
-          <div className="space-y-3">
+          <div className="space-y-3 min-h-0">
             <div className="grid grid-cols-2 gap-2">
               <Field label="Template name"><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. NY Will — Single, no kids" /></Field>
               <Field label="Jurisdiction"><Input value={jurisdiction} onChange={(e) => setJurisdiction(e.target.value.toUpperCase().slice(0, 2))} placeholder="CA" /></Field>
@@ -1008,8 +1008,8 @@ function IngestChatDialog({ open, onOpenChange, onCreated }: {
           </div>
 
           {/* Right: chat */}
-          <div className="space-y-2 flex flex-col">
-            <div className="rounded-lg border border-border bg-card min-h-96 max-h-112 overflow-y-auto p-4 space-y-3 flex-1">
+          <div className="space-y-2 flex min-h-0 flex-col">
+            <div className="rounded-lg border border-border bg-card min-h-64 lg:min-h-0 lg:max-h-none overflow-y-auto p-4 space-y-3 lg:flex-1">
               {messages.map((m, i) => (
                 <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                   <div className={`rounded-lg px-3 py-2 max-w-[85%] text-sm whitespace-pre-wrap ${m.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
@@ -1034,7 +1034,7 @@ function IngestChatDialog({ open, onOpenChange, onCreated }: {
           </div>
         </div>
 
-        <DialogFooter className="flex items-center justify-between gap-2 sm:justify-between">
+        <DialogFooter className="flex items-center justify-between gap-2 sm:justify-between shrink-0">
           <Button variant="ghost" onClick={() => { reset(); onOpenChange(false); }}>Cancel</Button>
           <Button onClick={() => ingest.mutate()} disabled={ingest.isPending || !body.trim()}>
             {ingest.isPending && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}

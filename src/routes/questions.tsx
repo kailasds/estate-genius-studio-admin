@@ -288,42 +288,44 @@ function UnmappedAttributesPanel({
       </div>
 
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[calc(100vh-2rem)] overflow-hidden grid-rows-[auto_minmax(0,1fr)_auto]">
           <DialogHeader>
             <DialogTitle className="font-serif text-2xl">Review AI-drafted question</DialogTitle>
             <DialogDescription>
               For attribute <b>{previewAttr?.label}</b> (<code className="text-xs">{previewAttr?.key}</code>). Edit anything below, then approve to add it to the bank.
             </DialogDescription>
           </DialogHeader>
-          {draft && (
-            <div className="space-y-4">
-              <Field label="Prompt">
-                <Textarea rows={2} value={draft.prompt} onChange={(e) => setDraft({ ...draft, prompt: e.target.value })} />
-              </Field>
-              <Field label="Help text">
-                <Textarea rows={2} value={draft.help_text ?? ""} onChange={(e) => setDraft({ ...draft, help_text: e.target.value })} />
-              </Field>
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="Input type">
-                  <Select value={draft.input_type} onValueChange={(v) => setDraft({ ...draft, input_type: v as Question["input_type"] })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {INPUT_TYPES.map((t) => <SelectItem key={t} value={t}>{INPUT_TYPE_LABEL[t]}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
+          <div className="min-h-0 overflow-y-auto pr-1">
+            {draft && (
+              <div className="space-y-4">
+                <Field label="Prompt">
+                  <Textarea rows={2} value={draft.prompt} onChange={(e) => setDraft({ ...draft, prompt: e.target.value })} />
                 </Field>
+                <Field label="Help text">
+                  <Textarea rows={2} value={draft.help_text ?? ""} onChange={(e) => setDraft({ ...draft, help_text: e.target.value })} />
+                </Field>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Field label="Input type">
+                    <Select value={draft.input_type} onValueChange={(v) => setDraft({ ...draft, input_type: v as Question["input_type"] })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {INPUT_TYPES.map((t) => <SelectItem key={t} value={t}>{INPUT_TYPE_LABEL[t]}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                </div>
+                {(draft.input_type === "select" || draft.input_type === "multiselect") && (
+                  <Field label="Answer options">
+                    <OptionsEditor
+                      options={draft.options}
+                      onChange={(opts) => setDraft({ ...draft, options: opts })}
+                    />
+                  </Field>
+                )}
               </div>
-              {(draft.input_type === "select" || draft.input_type === "multiselect") && (
-                <Field label="Answer options">
-                  <OptionsEditor
-                    options={draft.options}
-                    onChange={(opts) => setDraft({ ...draft, options: opts })}
-                  />
-                </Field>
-              )}
-            </div>
-          )}
-          <DialogFooter>
+            )}
+          </div>
+          <DialogFooter className="shrink-0">
             <Button variant="ghost" onClick={() => setPreviewOpen(false)}>Discard</Button>
             <Button onClick={approveCreate} disabled={!draft?.prompt.trim()}>
               <CheckCircle2 className="h-4 w-4 mr-1.5" />Approve & add
