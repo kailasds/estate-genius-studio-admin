@@ -1,0 +1,374 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ==========================================================================
+   DEP Admin Portal — Seline-inspired design system (ported from Will Crafted AI)
+   Warm-stone canvas, single cyan accent, editorial vertical rhythm.
+   ========================================================================== */
+
+@theme inline {
+  /* Palette (raw) */
+  --color-canvas: var(--canvas);
+  --color-ash: var(--ash);
+  --color-warm: var(--warm);
+  --color-ink: var(--ink);
+  --color-soot: var(--soot);
+  --color-sky: var(--sky);
+  --color-cyan: var(--cyan);
+  --color-cyan-edge: var(--cyan-edge);
+
+  /* shadcn semantic tokens mapped to the Seline palette */
+  --color-background: var(--canvas);
+  --color-foreground: var(--ink);
+  --color-paper: var(--canvas);
+  --color-paper-deep: var(--muted);
+  --color-card: var(--card);
+  --color-card-foreground: var(--ink);
+  --color-popover: var(--card);
+  --color-popover-foreground: var(--ink);
+  --color-primary: var(--cyan);
+  --color-primary-foreground: #ffffff;
+  --color-primary-soft: var(--sky);
+  --color-secondary: var(--card);
+  --color-secondary-foreground: var(--ink);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--warm);
+  --color-accent: var(--sky);
+  --color-accent-foreground: var(--cyan-edge);
+  --color-gold: var(--cyan);
+  --color-gold-foreground: #ffffff;
+  --color-destructive: var(--danger);
+  --color-destructive-foreground: #ffffff;
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input-bg);
+  --color-ring: var(--cyan);
+  --color-ring-offset-background: var(--canvas);
+
+  /* Semantic accents surfaced as first-class Tailwind colors */
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-edge: var(--success-edge);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-edge: var(--warning-edge);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-edge: var(--danger-edge);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-info-edge: var(--info-edge);
+  --color-violet: var(--violet);
+  --color-violet-soft: var(--violet-soft);
+  --color-violet-edge: var(--violet-edge);
+
+  /* Sidebar */
+  --color-sidebar: var(--card);
+  --color-sidebar-foreground: var(--warm);
+  --color-sidebar-primary: var(--cyan);
+  --color-sidebar-primary-foreground: #ffffff;
+  --color-sidebar-accent: var(--sky);
+  --color-sidebar-accent-foreground: var(--cyan-edge);
+  --color-sidebar-border: var(--border);
+  --color-sidebar-ring: var(--cyan);
+
+  /* Fonts — map --font-serif to Inter Tight so existing `font-serif`
+     display headings render in the Seline display face. */
+  --font-serif: "Inter Tight", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Inter Tight", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 24px;
+
+  /* Shadow */
+  --shadow-hairline: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
+  --shadow-card: rgba(0, 0, 0, 0.05) 0px 4px 16px 0px;
+  --shadow-panel: rgba(17, 12, 46, 0.10) 0px 12px 40px 0px;
+  --shadow-float: rgba(17, 12, 46, 0.12) 0px 12px 45px 0px;
+
+  /* ---- Design-system named aliases (Seline spec) ----
+     These expose the canonical token names from design-tokens.json / variables.css
+     so `bg-stone-canvas`, `text-cyan-signal`, `shadow-md`, `font-roobert`, etc. work
+     as first-class Tailwind utilities. Values match the raw palette above. */
+  --color-stone-canvas: var(--canvas);
+  --color-pure-white: #ffffff;
+  --color-stone-border: var(--border);
+  --color-stone-muted: #d6d3d1;
+  --color-ash-gray: var(--ash);
+  --color-warm-gray: var(--warm);
+  --color-ink-black: var(--ink);
+  --color-soot: var(--soot);
+  --color-sky-wash: var(--sky);
+  --color-cyan-signal: var(--cyan);
+  --color-cyan-edge: var(--cyan-edge);
+
+  --font-roobert: "Inter Tight", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-inter: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --shadow-subtle: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
+  --shadow-md: rgba(0, 0, 0, 0.05) 0px 4px 16px 0px;
+  --shadow-xl: rgba(17, 12, 46, 0.12) 0px 12px 45px 0px;
+}
+
+:root {
+  --radius: 10px;
+
+  --canvas: #f8f7f4;
+  --card: #ffffff;
+  --card-foreground: #0c0a09;
+  --border: #e8e4de;
+  --border-strong: #d9d4cc;
+  --muted: #f1eee8;
+  --input-bg: #fbfaf7;
+  --ash: #a8a29e;
+  --warm: #78716c;
+  --ink: #0c0a09;
+  --soot: #1c1917;
+  --sky: #dbeeff;
+  --cyan: #2e93e6;
+  --cyan-edge: #1f7cc7;
+
+  /* Semantic accent palette — used for status, badges, icon tiles */
+  --success: #16a373;
+  --success-soft: #e3f5ec;
+  --success-edge: #0f7a55;
+  --warning: #d98a1a;
+  --warning-soft: #fbeeda;
+  --warning-edge: #a86814;
+  --danger: #d24b4b;
+  --danger-soft: #fbe6e6;
+  --danger-edge: #a63a3a;
+  --info: #3b82f6;
+  --info-soft: #e0ecfe;
+  --info-edge: #2563eb;
+  --violet: #7c5cff;
+  --violet-soft: #ece7ff;
+  --violet-edge: #5a3ee6;
+
+  /* Focus ring */
+  --focus-ring: color-mix(in oklab, var(--cyan) 45%, transparent);
+}
+
+.dark {
+  --canvas: #0c0a09;
+  --card: #1c1917;
+  --card-foreground: #fafaf9;
+  --border: #292524;
+  --border-strong: #3a3532;
+  --muted: #26221f;
+  --input-bg: #211d1a;
+  --ash: #78716c;
+  --warm: #a8a29e;
+  --ink: #fafaf9;
+  --soot: #0c0a09;
+  --sky: #14324a;
+  --cyan: #3ba6f1;
+  --cyan-edge: #5cb8f5;
+
+  --success: #34d399;
+  --success-soft: #10362a;
+  --success-edge: #6ee7b7;
+  --warning: #f5b34a;
+  --warning-soft: #3b2a13;
+  --warning-edge: #fbcf7a;
+  --danger: #f26b6b;
+  --danger-soft: #3a1c1c;
+  --danger-edge: #f89a9a;
+  --info: #60a5fa;
+  --info-soft: #10254a;
+  --info-edge: #93c5fd;
+  --violet: #a48bff;
+  --violet-soft: #241d4d;
+  --violet-edge: #c0aefe;
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  html {
+    font-family: var(--font-sans);
+  }
+  body {
+    background-color: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.64;
+    letter-spacing: 0.004em;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3, .font-serif {
+    font-family: var(--font-serif);
+    font-optical-sizing: auto;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+  }
+  ::selection { background: var(--sky); color: var(--cyan-edge); }
+}
+
+/* ---- Signature utilities from the source design system ---- */
+
+@utility font-display { font-family: var(--font-display); }
+@utility font-mono-ui { font-family: var(--font-mono); }
+
+@utility text-display {
+  font-family: var(--font-display);
+  font-size: 52px;
+  line-height: 1.05;
+  letter-spacing: -0.026em;
+  font-weight: 400;
+}
+@utility text-heading {
+  font-family: var(--font-display);
+  font-size: 40px;
+  line-height: 1.1;
+  letter-spacing: -0.024em;
+  font-weight: 400;
+}
+@utility text-h-sm {
+  font-family: var(--font-display);
+  font-size: 32px;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  font-weight: 400;
+}
+@utility text-subh {
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1.25;
+  letter-spacing: -0.005em;
+  font-weight: 500;
+}
+@utility text-body-lg {
+  font-size: 16px;
+  line-height: 1.62;
+  color: var(--warm);
+}
+@utility text-caption {
+  font-size: 10px;
+  line-height: 1.2;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ash);
+  font-weight: 500;
+}
+@utility text-micro {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--warm);
+}
+
+@utility hl {
+  color: var(--cyan-edge);
+  background: var(--sky);
+  padding: 0.05em 0.35em;
+  border-radius: 6px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+@utility pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  font-size: 12px;
+  color: var(--ink);
+  line-height: 1;
+}
+
+@utility card-flat {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+}
+@utility card-feature {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+}
+@utility card-float {
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: var(--shadow-float);
+}
+@utility hairline { border-color: var(--border); }
+
+@utility side-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--warm);
+  transition: background 150ms ease, color 150ms ease;
+}
+@utility side-link-active {
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: var(--shadow-hairline);
+  border: 1px solid var(--border);
+}
+
+@utility kbd {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--card);
+  color: var(--warm);
+}
+
+@utility ring-cyan {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--cyan) 25%, transparent);
+}
+
+@utility paper {
+  background:
+    radial-gradient(circle at 20% 10%, rgba(0,0,0,0.015), transparent 50%),
+    radial-gradient(circle at 80% 90%, rgba(0,0,0,0.015), transparent 50%),
+    #ffffff;
+}
+
+@utility scroll-quiet {
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted) transparent;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+@keyframes pulseDot {
+  0%,100% { opacity: 0.35; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1); }
+}
+@utility anim-fade-up { animation: fadeUp 340ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+@utility anim-pulse-dot { animation: pulseDot 1.4s ease-in-out infinite; }
+@utility shimmer-bg {
+  background: linear-gradient(90deg, #f4f4f2 0%, #ececea 50%, #f4f4f2 100%);
+  background-size: 800px 100%;
+  animation: shimmer 1.6s linear infinite;
+}
