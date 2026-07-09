@@ -27,8 +27,13 @@ export const Route = createFileRoute("/api/chat")({
         if (!Array.isArray(body.messages)) {
           return new Response("Messages are required", { status: 400 });
         }
-        const key = process.env.LOVABLE_API_KEY;
-        if (!key) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
+        const { createAiGatewayProvider, getAiGatewayConfig } = await import("@/lib/ai-gateway.server");
+        let aiConfig: ReturnType<typeof getAiGatewayConfig>;
+        try {
+          aiConfig = getAiGatewayConfig();
+        } catch (error) {
+          return new Response((error as Error).message, { status: 500 });
+        }
 
         const personaName = body.persona === "spouse" ? "Jordan" : body.persona === "member" ? "Alex" : "there";
 
@@ -109,10 +114,9 @@ export const Route = createFileRoute("/api/chat")({
           ].join("\n");
         }
 
-        const { createLovableAiGatewayProvider } = await import("@/lib/ai-gateway.server");
-        const gateway = createLovableAiGatewayProvider(key);
+        const gateway = createAiGatewayProvider(aiConfig);
         const result = streamText({
-          model: gateway("google/gemini-3-flash-preview"),
+          model: gateway(aiConfig.model),
           system,
           messages: await convertToModelMessages(body.messages),
         });
