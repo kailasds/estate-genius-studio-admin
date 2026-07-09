@@ -74,8 +74,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "DEP Admin Portal — MetLife Legal Plans" },
       { name: "twitter:description", content: "Back-office admin portal for configuring the MetLife Legal Plans digital estate-planning experience." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/84f29768-c6c2-4117-937c-93d9a0110047/id-preview-acdc2b33--997f545e-4cc8-484f-9029-b6c900a7990e.lovable.app-1783575412782.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/84f29768-c6c2-4117-937c-93d9a0110047/id-preview-acdc2b33--997f545e-4cc8-484f-9029-b6c900a7990e.lovable.app-1783575412782.png" },
+      { property: "og:image", content: "/images/site-preview.png" },
+      { name: "twitter:image", content: "/images/site-preview.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

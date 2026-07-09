@@ -71,7 +71,7 @@ function MemberHome() {
       to: "/member/plan",
       title: started ? "Continue Your Will" : "Create Your Will",
       icon: ScrollText,
-      image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=800&q=60",
+      image: "/images/member-create-will.jpg",
       body: started
         ? `You're ${pct}% of the way through. Pick up where you left off.`
         : "We'll ask a few questions and generate a personalized Will tailored to your situation.",
@@ -83,7 +83,7 @@ function MemberHome() {
       to: "/member/find-attorney",
       title: "Find an Estate Planning Attorney",
       icon: MapPin,
-      image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=800&q=60",
+      image: "/images/member-find-attorney.jpg",
       body: "Connect with experienced attorneys near you for legal advice, document review, or in-person assistance.",
       cta: "Find Attorneys",
       meta: "In-person option",
@@ -93,7 +93,7 @@ function MemberHome() {
       to: "/member/learn",
       title: "Learning Center",
       icon: BookOpen,
-      image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=800&q=60",
+      image: "/images/member-learning-center.jpg",
       body: "Explore articles, videos, and answers to common questions to better understand estate planning and your legal documents.",
       cta: "Explore Resources",
       meta: "Reading & videos",
