@@ -20,6 +20,7 @@ export default defineConfig({
 
   vite: {
     server: {
+      port: 8082,
       allowedHosts: deploymentConfig.devAllowedHosts,
     },
   },

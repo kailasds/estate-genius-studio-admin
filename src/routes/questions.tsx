@@ -21,7 +21,7 @@ import { SERVICE_TAGS, tagLabel, type ServiceTag } from "@/lib/service-tags";
 import {
   Plus, Trash2, GripVertical, Sparkles, Loader2, Upload, Link as LinkIcon, FileText,
   Route as RouteIcon, GitBranch, History, AlertTriangle, CheckCircle2, X, ChevronRight,
-  Compass, ChevronUp, ChevronDown,
+  Compass, ChevronUp, ChevronDown, Lightbulb,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useDebouncedSave } from "@/lib/use-debounced-save";
@@ -558,6 +558,8 @@ function KnowledgeBasePanel({ questionId }: { questionId: string }) {
 
   const [linkTitle, setLinkTitle] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
+  const [tipTitle, setTipTitle] = useState("");
+  const [tipNotes, setTipNotes] = useState("");
 
   const onFile = async (file: File) => {
     if (file.size > 15_000_000) return toast.error("File too large (15MB max).");
@@ -584,6 +586,19 @@ function KnowledgeBasePanel({ questionId }: { questionId: string }) {
     toast.success("Link added");
   };
 
+  const addTip = async () => {
+    if (!tipTitle.trim() || !tipNotes.trim()) return;
+    // Stored as kind "link" (no url) — the "notes" field is what marks this as a quick FAQ
+    // tip rather than a real reference link, since the kind column only allows file/link.
+    const { error } = await supabase.from("question_kb_assets").insert({
+      question_id: questionId, kind: "link", title: tipTitle.trim(), notes: tipNotes.trim(),
+    });
+    if (error) return toast.error(error.message);
+    setTipTitle(""); setTipNotes("");
+    qc.invalidateQueries({ queryKey: ["kb", questionId] });
+    toast.success("FAQ tip added");
+  };
+
   const remove = async (a: KbAsset) => {
     if (!confirm("Remove this reference?")) return;
     if (a.kind === "file" && a.file_path) {
@@ -596,10 +611,10 @@ function KnowledgeBasePanel({ questionId }: { questionId: string }) {
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        Reference material the AI assistant can use when a member asks a question about this step. PDFs, DOCX, and helpful links.
+        Reference material the AI assistant can use when a member asks a question about this step — PDFs, links, and quick FAQ tips shown right on the question.
       </p>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         <label className="rounded-lg border border-dashed border-border bg-card hover:border-primary/40 cursor-pointer p-4 flex flex-col items-center justify-center gap-2 text-sm">
           <Upload className="h-5 w-5 text-primary" />
           <span className="font-medium">Upload file</span>
@@ -613,6 +628,12 @@ function KnowledgeBasePanel({ questionId }: { questionId: string }) {
           <Input placeholder="https://…" value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} />
           <Button size="sm" onClick={addLink} disabled={!linkUrl.trim()}>Add</Button>
         </div>
+        <div className="rounded-lg border border-border bg-card p-4 space-y-2">
+          <div className="text-sm font-medium flex items-center gap-1.5"><Lightbulb className="h-4 w-4 text-primary" />Add FAQ tip</div>
+          <Input placeholder="e.g. Which address do I use?" value={tipTitle} onChange={(e) => setTipTitle(e.target.value)} />
+          <Textarea rows={2} placeholder="Short, plain-language answer…" value={tipNotes} onChange={(e) => setTipNotes(e.target.value)} />
+          <Button size="sm" onClick={addTip} disabled={!tipTitle.trim() || !tipNotes.trim()}>Add</Button>
+        </div>
       </div>
 
       {assets.length === 0 ? (
@@ -621,11 +642,15 @@ function KnowledgeBasePanel({ questionId }: { questionId: string }) {
         <div className="rounded-lg border border-border divide-y divide-border bg-card">
           {assets.map((a) => (
             <div key={a.id} className="p-3 flex items-center gap-3">
-              {a.kind === "file" ? <FileText className="h-4 w-4 text-primary shrink-0" /> : <LinkIcon className="h-4 w-4 text-primary shrink-0" />}
+              {a.kind === "file" ? <FileText className="h-4 w-4 text-primary shrink-0" />
+                : a.notes ? <Lightbulb className="h-4 w-4 text-primary shrink-0" />
+                : <LinkIcon className="h-4 w-4 text-primary shrink-0" />}
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium truncate">{a.title ?? a.filename ?? a.url}</div>
                 <div className="text-[11px] text-muted-foreground truncate">
-                  {a.kind === "file" ? (a.mime_type || "file") + " · " + (a.file_path ?? "") : a.url}
+                  {a.kind === "file" ? (a.mime_type || "file") + " · " + (a.file_path ?? "")
+                    : a.notes ? a.notes
+                    : a.url}
                 </div>
               </div>
               <Button variant="ghost" size="sm" onClick={() => remove(a)} className="text-destructive"><Trash2 className="h-3.5 w-3.5" /></Button>

@@ -30,7 +30,7 @@ export function FloatingAssistant({ context }: { context?: AssistantContext }) {
             className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
             onClick={close}
           />
-          <div className="fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[600px] max-h-[calc(100vh-3rem)] rounded-xl bg-card border border-border shadow-2xl flex flex-col overflow-hidden">
+          <div className="fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[calc(100vh-3rem)] rounded-xl bg-card border border-border shadow-2xl flex flex-col overflow-hidden">
             <div className="px-4 py-3 border-b border-border flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
                 <MessageCircle className="h-4 w-4 text-primary" />

@@ -6,9 +6,10 @@ import {
 } from "@/components/ai-elements/conversation";
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import {
-  PromptInput, PromptInputTextarea, PromptInputFooter, PromptInputSubmit,
+  PromptInput, PromptInputTextarea, PromptInputSubmit,
   type PromptInputMessage,
 } from "@/components/ai-elements/prompt-input";
+import { InputGroupAddon } from "@/components/ui/input-group";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { Button } from "@/components/ui/button";
 import { MessageCircle, RotateCcw, ShieldAlert, Scale, LifeBuoy } from "lucide-react";
@@ -131,7 +132,7 @@ export function AssistantPanel({
                   {m.role === "user" ? (
                     <MessageContent>{text}</MessageContent>
                   ) : (
-                    <div className="max-w-[85%]"><MessageResponse>{text}</MessageResponse></div>
+                    <MessageContent className="max-w-[85%]"><MessageResponse>{text}</MessageResponse></MessageContent>
                   )}
                 </Message>
               );
@@ -156,9 +157,9 @@ export function AssistantPanel({
       <div className="border-t border-border p-3 bg-paper-deep/40 shrink-0">
         <PromptInput onSubmit={onSubmit}>
           <PromptInputTextarea ref={textareaRef} placeholder="Ask about estate planning…" />
-          <PromptInputFooter className="justify-end">
+          <InputGroupAddon align="inline-end">
             <PromptInputSubmit status={status} disabled={busy && status !== "streaming"} />
-          </PromptInputFooter>
+          </InputGroupAddon>
         </PromptInput>
         <p className="text-[11px] text-muted-foreground mt-2 px-1">
           Estate-planning topics only. AI can be wrong — verify important details with an attorney.

@@ -15,14 +15,19 @@ import {
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { supabase } from "@/integrations/supabase/client";
 import { useRole, PERSONAS } from "@/lib/role-context";
 import { useDraft, percentComplete, type MemberDraft } from "@/lib/member-draft";
+import { cn } from "@/lib/utils";
 
 import {
   CheckCircle2, ArrowRight, ArrowLeft, Sparkles, RotateCcw, Upload, Mic, Square,
   FileText, HelpCircle, AlertCircle, Printer, Check, X, UserPlus, Compass, ClipboardList,
+  CalendarIcon, Lightbulb,
 } from "lucide-react";
+import { format } from "date-fns";
 import { toast } from "sonner";
 import { tagLabel, tagDescription, SERVICE_TAGS, EXTRA_DOCS } from "@/lib/service-tags";
 import { loadDraft } from "@/lib/member-draft";
@@ -214,6 +219,17 @@ function PlanPage() {
           )}
         </div>
       }
+      splitRight={step === "interview" ? (
+        <DocsSidebar
+          templates={data.templates}
+          selectedDocs={selectedDocs}
+          answers={draft.answers}
+          discovery={draft.discovery}
+          attrByQid={attrByQid}
+          partnerLabel={partnerLabel}
+          partnerRole={partnerRole}
+        />
+      ) : undefined}
     >
       {step !== "start" && (
         <StepNav step={step} setStep={setStep} hasRecs={recommendations.length > 0} selectedDocs={selectedDocs} pct={pct} />
@@ -805,66 +821,126 @@ function InterviewStep({ questions, answers, onAnswer, templates, attrByQid, dis
   const isLast = !nextIdFor(q, value, questions);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr,380px] gap-6">
-      <div>
-        <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
-          <div className="text-xs text-muted-foreground">
-            Question {pos + 1}{isLast ? " (last)" : ""} · {doneCount} answered
-          </div>
-          <Button variant="outline" size="sm" onClick={onInvite}>
-            <UserPlus className="h-4 w-4 mr-1.5" /> Invite {partnerLabel}
-          </Button>
+    <div>
+      <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
+        <div className="text-xs text-muted-foreground">
+          Question {pos + 1}{isLast ? " (last)" : ""} · {doneCount} answered
         </div>
-
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={q.id}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.2 }}
-          >
-            <PromptCard prompt={q.prompt} help={q.help_text} why={q.why_we_ask ?? q.how_to_answer}>
-              {q.required && <div className="mb-3"><Badge variant="outline" className="text-[10px]">Required</Badge></div>}
-              <QuestionInput q={q} value={value} onChange={(v) => onAnswer(q.id, v)} options={Array.isArray(q.options) ? q.options : []} />
-            </PromptCard>
-          </motion.div>
-        </AnimatePresence>
-
-        <div className="flex justify-between items-center mt-4">
-          <Button variant="ghost" onClick={goPrev}>
-            <ArrowLeft className="h-4 w-4 mr-1" /> {pos === 0 ? "Back to plan" : "Previous"}
-          </Button>
-          {isLast ? (
-            <Button onClick={onDone} disabled={q.required && !answered}>
-              Finish interview <CheckCircle2 className="h-4 w-4 ml-1" />
-            </Button>
-          ) : (
-            <Button onClick={goNext} disabled={q.required && !answered}>
-              Next <ArrowRight className="h-4 w-4 ml-1" />
-            </Button>
-          )}
-        </div>
+        <Button variant="outline" size="sm" onClick={onInvite}>
+          <UserPlus className="h-4 w-4 mr-1.5" /> Invite {partnerLabel}
+        </Button>
       </div>
 
-      <aside className="space-y-4">
-        <LiveDocsPanel
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={q.id}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.2 }}
+        >
+          <PromptCard prompt={q.prompt} help={q.help_text} why={q.why_we_ask ?? q.how_to_answer}>
+            {q.required && <div className="mb-3"><Badge variant="outline" className="text-[10px]">Required</Badge></div>}
+            <QuestionInput q={q} value={value} onChange={(v) => onAnswer(q.id, v)} options={Array.isArray(q.options) ? q.options : []} />
+          </PromptCard>
+        </motion.div>
+      </AnimatePresence>
+
+      <div className="flex justify-between items-center mt-4">
+        <Button variant="ghost" onClick={goPrev}>
+          <ArrowLeft className="h-4 w-4 mr-1" /> {pos === 0 ? "Back to plan" : "Previous"}
+        </Button>
+        {isLast ? (
+          <Button onClick={onDone} disabled={q.required && !answered}>
+            Finish interview <CheckCircle2 className="h-4 w-4 ml-1" />
+          </Button>
+        ) : (
+          <Button onClick={goNext} disabled={q.required && !answered}>
+            Next <ArrowRight className="h-4 w-4 ml-1" />
+          </Button>
+        )}
+      </div>
+
+      <RelatedFaqs questionId={q.id} prompt={q.prompt} />
+    </div>
+  );
+}
+
+/* ---- Related FAQ tips, authored per-question by admins ---- */
+function RelatedFaqs({ questionId, prompt }: { questionId: string; prompt: string }) {
+  const { data: dbTips = [] } = useQuery({
+    queryKey: ["kb_notes", questionId],
+    queryFn: async () => {
+      // Tips are stored as kind "link" with no url — "notes" is what marks them as
+      // a quick FAQ tip rather than a real reference link.
+      const { data, error } = await supabase.from("question_kb_assets")
+        .select("*").eq("question_id", questionId).eq("kind", "link").not("notes", "is", null).order("created_at");
+      if (error) throw error;
+      return data as { id: string; title: string | null; notes: string | null }[];
+    },
+  });
+
+  // Sample tip so the "address" question demonstrates this UI without needing
+  // an admin-authored DB row yet.
+  const sampleTips: { id: string; title: string; notes: string }[] = [];
+  if (/address/i.test(prompt)) {
+    sampleTips.push({
+      id: "sample-address",
+      title: "Which address do I use?",
+      notes: "Use your permanent legal residence, not a temporary mailing or work address.",
+    });
+  }
+
+  const tips = [...sampleTips, ...dbTips];
+  if (tips.length === 0) return null;
+
+  return (
+    <div className="mt-6 pt-5 border-t border-border space-y-2">
+      <div className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+        <Lightbulb className="h-3.5 w-3.5" /> Related FAQs
+      </div>
+      {tips.map((t) => (
+        <div key={t.id} className="rounded-md border border-border bg-primary-soft/20 p-3">
+          {t.title && <div className="text-sm font-medium">{t.title}</div>}
+          {t.notes && <div className="text-sm text-muted-foreground mt-1 whitespace-pre-line">{t.notes}</div>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ---------------- Docs sidebar — docked full-height, right side ---------------- */
+
+function DocsSidebar({ templates, selectedDocs, answers, discovery, attrByQid, partnerLabel, partnerRole }: {
+  templates: any[];
+  selectedDocs: string[];
+  answers: Record<string, unknown>;
+  discovery: Record<string, unknown>;
+  attrByQid: Map<string, { key: string; tags: string[] }>;
+  partnerLabel: string;
+  partnerRole: "member" | "spouse";
+}) {
+  const partnerDraft = useMemo(() => loadDraft(partnerRole), [partnerRole]);
+  const partnerActive = (partnerDraft.selectedDocs ?? []).length > 0 || Object.keys(partnerDraft.answers ?? {}).length > 0;
+
+  return (
+    <div className="flex flex-col gap-4 p-4 lg:h-full">
+      <LiveDocsPanel
+        templates={templates}
+        selectedDocs={selectedDocs}
+        answers={answers}
+        discovery={discovery}
+        attrByQid={attrByQid}
+        className="flex-1 min-h-0"
+      />
+      {partnerActive && (
+        <PartnerReadOnlyPanel
+          partnerLabel={partnerLabel}
+          partnerDraft={partnerDraft}
           templates={templates}
-          selectedDocs={selectedDocs}
-          answers={answers}
-          discovery={discovery}
           attrByQid={attrByQid}
         />
-        {partnerActive && (
-          <PartnerReadOnlyPanel
-            partnerLabel={partnerLabel}
-            partnerDraft={partnerDraft}
-            templates={templates}
-            attrByQid={attrByQid}
-          />
-        )}
-      </aside>
-
+      )}
     </div>
   );
 }
@@ -890,8 +966,30 @@ function QuestionInput({ q, value, onChange, options }: { q: any; value: unknown
       return <Textarea rows={5} value={value ? String(value) : ""} onChange={(e) => onChange(e.target.value)} />;
     case "number":
       return <Input className="max-w-xs" type="number" value={value ? String(value) : ""} onChange={(e) => onChange(Number(e.target.value))} />;
-    case "date":
-      return <Input className="max-w-xs" type="date" value={value ? String(value) : ""} onChange={(e) => onChange(e.target.value)} />;
+    case "date": {
+      const selected = value ? new Date(String(value)) : undefined;
+      return (
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn("max-w-xs w-full justify-start font-normal", !value && "text-muted-foreground")}
+            >
+              <CalendarIcon className="h-4 w-4" />
+              {selected ? format(selected, "PPP") : "Pick a date"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={selected}
+              captionLayout="dropdown"
+              onSelect={(d) => d && onChange(format(d, "yyyy-MM-dd"))}
+            />
+          </PopoverContent>
+        </Popover>
+      );
+    }
     case "address":
       return <Textarea rows={3} placeholder="Street, City, State, ZIP" value={value ? String(value) : ""} onChange={(e) => onChange(e.target.value)} />;
     case "document_upload":
@@ -996,12 +1094,13 @@ function VoiceInput({ questionId, value, onChange }: { questionId: string; value
 
 /* ---------------- Live docs panel ---------------- */
 
-function LiveDocsPanel({ templates, selectedDocs, answers, discovery, attrByQid }: {
+function LiveDocsPanel({ templates, selectedDocs, answers, discovery, attrByQid, className }: {
   templates: any[];
   selectedDocs: string[];
   answers: Record<string, unknown>;
   discovery: Record<string, unknown>;
   attrByQid: Map<string, { key: string; tags: string[] }>;
+  className?: string;
 }) {
   const merged = useMemo(() => {
     const m: Record<string, unknown> = { ...discovery };
@@ -1017,14 +1116,14 @@ function LiveDocsPanel({ templates, selectedDocs, answers, discovery, attrByQid 
   const template = activeDoc ? templates.find((x) => (x.tags ?? []).includes(activeDoc)) : null;
 
   return (
-    <Card className="p-4 sticky top-4">
-      <div className="flex items-center gap-2 mb-3">
+    <Card className={`p-4 flex flex-col min-h-0 ${className ?? ""}`}>
+      <div className="flex items-center gap-2 mb-3 shrink-0">
         <FileText className="h-4 w-4 text-primary" />
         <div className="font-serif text-lg">Your documents</div>
         <Badge variant="secondary" className="text-[10px] ml-auto">Live preview</Badge>
       </div>
       {selectedDocs.length > 1 && (
-        <div className="flex flex-wrap gap-1.5 mb-3 border-b border-border pb-3">
+        <div className="flex flex-wrap gap-1.5 mb-3 border-b border-border pb-3 shrink-0">
           {selectedDocs.map((d) => {
             const on = d === activeDoc;
             return (
@@ -1044,10 +1143,10 @@ function LiveDocsPanel({ templates, selectedDocs, answers, discovery, attrByQid 
           })}
         </div>
       )}
-      <p className="text-xs text-muted-foreground mb-3">
+      <p className="text-xs text-muted-foreground mb-3 shrink-0">
         {activeDoc ? `Preview of your ${tagLabel(activeDoc)}. Updates as you answer.` : "Select a document to preview."}
       </p>
-      <div className="rounded-md border border-border p-3 bg-paper-deep/40 max-h-[70vh] overflow-auto">
+      <div className="rounded-md border border-border p-3 bg-paper-deep/40 flex-1 min-h-0 overflow-auto">
         {activeDoc && template ? (
           <MergedPreview body={template.body ?? ""} values={merged} />
         ) : activeDoc ? (
@@ -1135,7 +1234,7 @@ function MergedPreview({ body, values }: { body: string; values: Record<string, 
     if (v === undefined || v === null || v === "") return `[${key}]`;
     return Array.isArray(v) ? v.join(", ") : String(v);
   });
-  return <div className="text-[11px] text-foreground/80 whitespace-pre-wrap leading-relaxed max-h-40 overflow-auto font-serif">{rendered}</div>;
+  return <div className="text-[11px] text-foreground/80 whitespace-pre-wrap leading-relaxed h-full overflow-auto font-serif">{rendered}</div>;
 }
 
 /* ---------------- Review & Confirm (inline editable) ---------------- */

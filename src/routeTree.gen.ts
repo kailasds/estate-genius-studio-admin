@@ -17,6 +17,7 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MemberIndexRouteImport } from './routes/member.index'
+import { Route as TemplatesFamilyIdRouteImport } from './routes/templates_.$familyId'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as MemberPlanRouteImport } from './routes/member.plan'
 import { Route as MemberLearnRouteImport } from './routes/member.learn'
@@ -64,6 +65,11 @@ const MemberIndexRoute = MemberIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => MemberRoute,
+} as any)
+const TemplatesFamilyIdRoute = TemplatesFamilyIdRouteImport.update({
+  id: '/templates_/$familyId',
+  path: '/templates/$familyId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ShareTokenRoute = ShareTokenRouteImport.update({
   id: '/share/$token',
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/member/learn': typeof MemberLearnRoute
   '/member/plan': typeof MemberPlanRoute
   '/share/$token': typeof ShareTokenRoute
+  '/templates/$familyId': typeof TemplatesFamilyIdRoute
   '/member/': typeof MemberIndexRoute
 }
 export interface FileRoutesByTo {
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/member/learn': typeof MemberLearnRoute
   '/member/plan': typeof MemberPlanRoute
   '/share/$token': typeof ShareTokenRoute
+  '/templates/$familyId': typeof TemplatesFamilyIdRoute
   '/member': typeof MemberIndexRoute
 }
 export interface FileRoutesById {
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/member/learn': typeof MemberLearnRoute
   '/member/plan': typeof MemberPlanRoute
   '/share/$token': typeof ShareTokenRoute
+  '/templates_/$familyId': typeof TemplatesFamilyIdRoute
   '/member/': typeof MemberIndexRoute
 }
 export interface FileRouteTypes {
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/member/learn'
     | '/member/plan'
     | '/share/$token'
+    | '/templates/$familyId'
     | '/member/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
     | '/member/learn'
     | '/member/plan'
     | '/share/$token'
+    | '/templates/$familyId'
     | '/member'
   id:
     | '__root__'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '/member/learn'
     | '/member/plan'
     | '/share/$token'
+    | '/templates_/$familyId'
     | '/member/'
   fileRoutesById: FileRoutesById
 }
@@ -215,6 +227,7 @@ export interface RootRouteChildren {
   TemplatesRoute: typeof TemplatesRoute
   ApiChatRoute: typeof ApiChatRoute
   ShareTokenRoute: typeof ShareTokenRoute
+  TemplatesFamilyIdRoute: typeof TemplatesFamilyIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -274,6 +287,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/member/'
       preLoaderRoute: typeof MemberIndexRouteImport
       parentRoute: typeof MemberRoute
+    }
+    '/templates_/$familyId': {
+      id: '/templates_/$familyId'
+      path: '/templates/$familyId'
+      fullPath: '/templates/$familyId'
+      preLoaderRoute: typeof TemplatesFamilyIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/share/$token': {
       id: '/share/$token'
@@ -358,6 +378,7 @@ const rootRouteChildren: RootRouteChildren = {
   TemplatesRoute: TemplatesRoute,
   ApiChatRoute: ApiChatRoute,
   ShareTokenRoute: ShareTokenRoute,
+  TemplatesFamilyIdRoute: TemplatesFamilyIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -77,11 +77,17 @@ function crumbFor(pathname: string): string {
   return last.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export function AppShell({ children, title, subtitle, action }: {
+export function AppShell({ children, title, subtitle, action, splitRight, crumb: crumbOverride, eyebrow }: {
   children: ReactNode;
   title: string;
   subtitle?: string;
   action?: ReactNode;
+  /** Optional panel docked flush to the right edge of the viewport, spanning the full height of the content area. */
+  splitRight?: ReactNode;
+  /** Override the auto-derived breadcrumb (e.g. a record name instead of a raw route param). */
+  crumb?: string;
+  /** Optional content rendered above the title (e.g. a "Back to X" link). */
+  eyebrow?: ReactNode;
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [collapsed, setCollapsed] = useState(true);
@@ -89,7 +95,7 @@ export function AppShell({ children, title, subtitle, action }: {
   const persona = PERSONAS[role];
   const isMember = role === "member" || role === "spouse";
   const nav = isMember ? MEMBER_NAV : ADMIN_NAV;
-  const crumb = crumbFor(pathname);
+  const crumb = crumbOverride ?? crumbFor(pathname);
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -215,21 +221,29 @@ export function AppShell({ children, title, subtitle, action }: {
             </div>
           </header>
 
-          <main className="flex-1 overflow-auto">
-            <div className="max-w-6xl mx-auto px-8 py-10">
-              <div className="mb-8">
-                <div className="flex items-start justify-between gap-6">
-                  <div className="min-w-0">
-                    <h1 className="font-serif text-[38px] leading-[1.05] tracking-tight text-foreground">{title}</h1>
-                  </div>
-                {action && <div className="shrink-0">{action}</div>}
+          <main className="flex-1 min-h-0 overflow-y-auto lg:overflow-hidden lg:flex">
+            <div className="lg:flex-1 lg:min-w-0 lg:overflow-y-auto">
+              <div className="max-w-6xl mx-auto px-8 py-10">
+                <div className="mb-8">
+                  {eyebrow && <div className="mb-4">{eyebrow}</div>}
+                  <div className="flex items-start justify-between gap-6">
+                    <div className="min-w-0">
+                      <h1 className="font-serif text-[38px] leading-[1.05] tracking-tight text-foreground">{title}</h1>
+                    </div>
+                  {action && <div className="shrink-0">{action}</div>}
+                </div>
+                  {subtitle && (
+                    <p className="mt-3 w-full max-w-none text-[15px] leading-relaxed text-muted-foreground">{subtitle}</p>
+                  )}
+                </div>
+                {children}
               </div>
-                {subtitle && (
-                  <p className="mt-3 w-full max-w-none text-[15px] leading-relaxed text-muted-foreground">{subtitle}</p>
-                )}
-              </div>
-              {children}
             </div>
+            {splitRight && (
+              <aside className="border-t border-border lg:border-t-0 lg:border-l lg:flex lg:flex-col lg:w-[420px] lg:shrink-0 lg:overflow-y-auto bg-paper/70">
+                {splitRight}
+              </aside>
+            )}
           </main>
         </div>
         {isMember && !pathname.startsWith("/member/assistant") && <FloatingAssistant />}

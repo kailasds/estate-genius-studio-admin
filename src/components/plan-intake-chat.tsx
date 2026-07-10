@@ -176,7 +176,7 @@ export function PlanIntakeChat({ onBack }: { onBack: () => void }) {
                 {m.role === "user" ? (
                   <MessageContent>{visibleText}</MessageContent>
                 ) : (
-                  <div className="max-w-[85%]"><MessageResponse>{visibleText}</MessageResponse></div>
+                  <MessageContent className="max-w-[85%]"><MessageResponse>{visibleText}</MessageResponse></MessageContent>
                 )}
               </Message>
             );

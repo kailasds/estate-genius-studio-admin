@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Vault, FileText, Eye, Share2, Download, ShieldCheck, Copy } from "lucide-react";
+import { Vault, FileText, Eye, Share2, Download, ShieldCheck, Copy, CopyPlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useRole, PERSONAS, type Role } from "@/lib/role-context";
 import { loadDraft } from "@/lib/member-draft";
@@ -93,6 +93,11 @@ function VaultContents({ role, onClose }: { role: Role; onClose: () => void }) {
     toast.success("Secure share link copied");
   };
 
+  const handleClone = (doc: string) => {
+    const label = tagLabel(doc);
+    toast.success(`${label} cloned`);
+  };
+
   const handleDownload = (doc: string) => {
     const label = tagLabel(doc);
     const body = [
@@ -139,6 +144,7 @@ function VaultContents({ role, onClose }: { role: Role; onClose: () => void }) {
                 complete
                 onView={onClose}
                 onShare={() => handleShare(doc)}
+                onClone={() => handleClone(doc)}
                 onDownload={() => handleDownload(doc)}
               />
             ))}
@@ -159,6 +165,7 @@ function VaultContents({ role, onClose }: { role: Role; onClose: () => void }) {
                 complete={false}
                 onView={onClose}
                 onShare={() => handleShare(doc)}
+                onClone={() => handleClone(doc)}
                 onDownload={() => handleDownload(doc)}
               />
             ))}
@@ -174,46 +181,48 @@ function VaultContents({ role, onClose }: { role: Role; onClose: () => void }) {
 }
 
 function VaultRow({
-  doc, complete, onView, onShare, onDownload,
+  doc, complete, onView, onShare, onClone, onDownload,
 }: {
   doc: string;
   complete: boolean;
   onView: () => void;
   onShare: () => void;
+  onClone: () => void;
   onDownload: () => void;
 }) {
   return (
     <Card className="p-3">
-      <div className="flex items-start gap-3">
-        <div className="h-9 w-9 rounded-md bg-primary/10 text-primary grid place-items-center shrink-0">
-          <FileText className="h-4 w-4" />
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 rounded-md bg-primary/10 text-primary grid place-items-center shrink-0">
+            <FileText className="h-4 w-4" />
+          </div>
+          <span className="font-medium text-sm truncate">{tagLabel(doc)}</span>
+          <Badge variant={complete ? "default" : "secondary"} className="text-[10px]">
+            {complete ? "Complete" : "Draft"}
+          </Badge>
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-medium text-sm truncate">{tagLabel(doc)}</span>
-            <Badge variant={complete ? "default" : "secondary"} className="text-[10px]">
-              {complete ? "Complete" : "Draft"}
-            </Badge>
-          </div>
-          <div className="mt-2 flex items-center gap-1">
-            <Button asChild size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={onView}>
-              <Link to="/member/plan"><Eye className="h-3.5 w-3.5 mr-1" /> View</Link>
-            </Button>
-            <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={onShare}>
-              <Share2 className="h-3.5 w-3.5 mr-1" /> Share
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              className="h-7 px-2 text-xs"
-              onClick={onDownload}
-              disabled={!complete}
-              title={complete ? "Download" : "Available once complete"}
-            >
-              {complete ? <Download className="h-3.5 w-3.5 mr-1" /> : <Copy className="h-3.5 w-3.5 mr-1" />}
-              Download
-            </Button>
-          </div>
+        <div className="flex items-center gap-1 w-full">
+          <Button asChild size="sm" variant="ghost" className="h-7 flex-1 px-1.5 text-xs" onClick={onView}>
+            <Link to="/member/plan"><Eye className="h-3.5 w-3.5 mr-1" /> View</Link>
+          </Button>
+          <Button size="sm" variant="ghost" className="h-7 flex-1 px-1.5 text-xs" onClick={onShare}>
+            <Share2 className="h-3.5 w-3.5 mr-1" /> Share
+          </Button>
+          <Button size="sm" variant="ghost" className="h-7 flex-1 px-1.5 text-xs" onClick={onClone}>
+            <CopyPlus className="h-3.5 w-3.5 mr-1" /> Clone
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-7 flex-1 px-1.5 text-xs"
+            onClick={onDownload}
+            disabled={!complete}
+            title={complete ? "Download" : "Available once complete"}
+          >
+            {complete ? <Download className="h-3.5 w-3.5 mr-1" /> : <Copy className="h-3.5 w-3.5 mr-1" />}
+            Download
+          </Button>
         </div>
       </div>
     </Card>
